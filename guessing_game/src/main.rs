@@ -1,7 +1,8 @@
-//extern crate rand;
+extern crate rand;
 
-use std::io;
 use rand::Rng;
+use std::cmp::Ordering;
+use std::io;
 
 fn main() {
     println!("Guess the number!");
@@ -10,13 +11,36 @@ fn main() {
     // gen_range(low..high) -> 1..100일 경우 1~99
     // gen_range(low..=high) -> 1..=100일 경우 1~100
 
-    println!("The secret number is: {}", secret_number);
-    println!("Please input your guess.");
+    // println!("The secret number is: {}", secret_number);
 
-    let mut guess = String::new();
+    loop {
+        println!("Please input your guess.");
 
-    io::stdin().read_line(&mut guess)
-        .expect("Failed to read line");
+        let mut guess = String::new();
 
-    println!("You guessed : {}", guess);
+        io::stdin()
+            .read_line(&mut guess)
+            .expect("Failed to read line");
+
+        // variable shadowning
+        // trim() -> carriage return(CR) 혹은 line feed(\n) 제거
+        let guess: u32 = match guess.trim().parse() {
+            Ok(num) => num,
+            Err(_) => {
+                println!("Please type a number!");
+                continue;
+            }
+        };
+
+        println!("You guessed : {}", guess);
+
+        match guess.cmp(&secret_number) {
+            Ordering::Less => println!("Too small!"),
+            Ordering::Greater => println!("Too big!"),
+            Ordering::Equal => {
+                println!("You win!");
+                break;
+            }
+        }
+    }
 }
