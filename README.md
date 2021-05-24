@@ -79,3 +79,60 @@ println!("{}, world!", s1); // 정상 출력
 * `true` / `false` 값을 갖는 `bool` 타입
 * `f64`와 같은 모든 부동 소수점 타입
 * `Copy`가 가능한 타입들로 이루어진 튜플. `(i32, i32)`는 `Copy trait`이 동작하지만 `(i32, String)`은 동작하지 않는다.
+
+
+# Enum(열거형)
+
+[표준 라이브러리](https://doc.rust-lang.org/std/net/enum.IpAddr.html)에 이미 정의되어 있음.
+
+```rust
+enum IpAddr {
+    V4(u8, u8, u8, u8),
+    V6(String),
+}
+
+let home = IpAddr::V4(127.0.0.1);
+let loopback = IpAddr::V6(String::from("::1"));
+```
+
+# Collection
+
+## String
+
+`ASCII` 문자를 제외한 문자는 모두 `UTF-8`로 처리되며, 흔히 계산하는 문자열의 길이는 `chars().count()`로 처리하여야 한다.
+
+```rust
+fn main() {
+    let hello1 = "안녕하세요.";
+    let hello2 = "Hello.";
+
+    println!("[안녕하세요.] length is {}.", hello1.len());          // [안녕하세요.] length is 16. 반환
+    println!("[안녕하세요.] count is {}.", hello1.chars().count()); // [안녕하세요.] count is 6. 반환
+    println!("[Hello.] length is {}.", hello2.len());            // [Hello.] length is 6. 반환
+    println!("[Hello.] count is {}.", hello2.chars().count());   // [Hello.] count is 6. 반환
+}
+```
+
+## HashMap
+
+`HashMap<K, V>`에서 Key혹은 Value에 해당하는 값이 `String`일 경우 소유권이 이전됨. `Copy trait`이 구현된 타입(예: `i32`)은 자동으로 값이 복사된다.
+
+```rust
+use std::collections::HashMap;
+
+fn main() {
+    let field_name = String::from("Favorite color");
+    let field_value = String::from("Blue");
+
+    let mut map:HashMap<String, String> = HashMap::new();
+
+    map.insert(field_name, field_value);
+
+    println!("after field_name : {}", field_name); // borrow of moved value: `field_name` 오류 발생
+    println!("after field_value : {}", field_value); // borrow of moved value: `field_value` 오류 발생
+}
+```
+
+# 에러처리
+
+예제에서는 `RUST_BACKTRACE=1 cargo run`으로 명시되어 있으나, 전체 메세지를 보려면 `RUST_BACKTRACE=full cargo run`으로 실행하여야 한다.
