@@ -326,3 +326,42 @@ fn run(config: Config) -> Result<(), Box<dyn Error>> {
 ```
 
 `dyn` 키워드는 `Trait`의 `dynamic dispatch`를 적용한다는 의미라는데, 확인이 필요하다([SEORENN님 블로그](https://seorenn.tistory.com/161)).
+
+# Iterator
+
+반복자는 **게으르다** 라는 말은 다음과 같다.
+
+```rust
+fn main() {
+    let v1 = vec![1, 2, 3];
+    let v1_iter = v1.iter();
+
+    v1_iter.map(|x| x + 1);
+}
+```
+
+위의 소스를 빌드할 경우 다음과 같은 경고가 출력된다.
+
+```bash
+ --> src/main.rs:5:5
+  |
+5 | v1_iter.map(|x| x + 1);
+  | ^^^^^^^^^^^^^^^^^^^^^^^
+  |
+  = note: `#[warn(unused_must_use)]` on by default
+  = note: iterators are lazy and do nothing unless consume
+```
+
+소스상으로는 반복자 어댑터 함수인 `map`을 호출할 경우 인자로 전달된 `|x| x + 1` 클로저가 실행될 것으로 예상하지만, 실제로는 호출되지 않는다.<br>
+경고 메세지의 의미는 반복자는 실제 **소비**가 되는 시점에 호출된다는 의미이다.<br>
+따라서 `map` 함수는 아래 예제처럼 `collect` 함수가 호출되는 시점에 실행된다.
+
+```rust
+fn main() {
+    let v1 = vec![1, 2, 3];
+    let v1_iter = v1.iter();
+    let result: Vec<_> = v1_iter.map(|x| x + 1).collect();
+
+    println!("result is {}", result);
+}
+```
