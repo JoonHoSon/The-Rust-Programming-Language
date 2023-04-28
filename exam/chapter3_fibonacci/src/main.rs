@@ -8,10 +8,12 @@ fn main() {
 
         let mut _input: String = String::new();
 
-        io::stdin().read_line(&mut _input).expect("Please enter number!!!");
+        io::stdin()
+            .read_line(&mut _input)
+            .expect("Please enter number!!!");
 
         let input_number: u32 = match _input.trim().parse() {
-           Ok(num) => num,
+            Ok(num) => num,
             Err(_) => {
                 println!("Please type a number!!!");
 
