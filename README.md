@@ -15,3 +15,4 @@
 * [4.1 소유권이 뭔가요? - 반환 값과 스코프(tuple return)](./ownership_tuple)
 * [4.2 참조자와 빌림 - reference](./ownership_reference)
 * [4.2 참조자와 빌림 - Dangling Reference](./dangling_reference)
+* [4.3 슬라이스](./slice_first_word)
