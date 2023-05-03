@@ -1,10 +1,10 @@
 fn main() {
-    let mut s: String = String::from("hello world");
-    let first_word = first_word(&s);
-    let second_word = second_word(&s);
+    let s: String = String::from("나랏말쌈이 뒹귝에");
+    let first_word = first_word(&s[..]);
+    let second_word = second_word(&s[..]);
 
-    println!("first word is {}.", first_word);
-    println!("second word is {}.", second_word);
+    println!("first word is [{}].", first_word);
+    println!("second word is [{}].", second_word);
 
     //s.clear(); // cannot borrow `s` as mutable because it is also borrowed as immutable 오류
 
