@@ -1,3 +1,10 @@
+#[derive(Debug)]
+enum SpreadsheetCell {
+    Int(i32),
+    Float(f64),
+    Text(String),
+}
+
 fn main() {
     let mut v = vec![1, 2, 3, 4, 5];
 
@@ -16,5 +23,15 @@ fn main() {
     // https://doc.rust-lang.org/book/ch08-01-vectors.html
     // Listing 8-6: Attempting to add an element to a vector while holding a reference to an item 참고
     // cannot borrow `v2` as mutable because it is also borrowed as immutable 오류 발생
-    print!("The first element is : {first}");
+    // print!("The first element is : {first}");
+
+    let row: Vec<SpreadsheetCell> = vec![
+        SpreadsheetCell::Int(3),
+        SpreadsheetCell::Float(10.12),
+        SpreadsheetCell::Text(String::from("blue")),
+    ];
+
+    for cell in row {
+        println!("cell value is {:?}", cell);
+    }
 }
