@@ -34,4 +34,15 @@ fn main() {
     score.entry("Yellow".to_string()).or_insert(80);
 
     println!("{:?}", score);
+
+    let text: &str = "hello world wonderful world";
+    let mut map = HashMap::new();
+
+    for word in text.split_whitespace() {
+        let count = map.entry(word).or_insert(0);
+
+        *count += 1;
+    }
+
+    println!("{:?}", map);
 }
