@@ -10,10 +10,10 @@ use std::io;
 const CLEAR: &str = "\x1B[2J\x1B[1;1H";
 const MESSAGE: &str = "
 Please select command.
-show : Show employee list of department.
-add : Add employee to department.
-main : Move this screen.
-quit : Exit program.
+ex1) add John to engineering
+ex2) show all
+ex3) show engineering
+ex4) exit
 ";
 const SHOW_MESSAGE: &str = "
 department : Show departments.
@@ -41,7 +41,7 @@ fn main() {
             show_command();
         } else if command == "main" {
             display_command();
-        } else if command == "quit" {
+        } else if command == "exit" {
             break;
         } else {
             println!("{}", "Input [add | show]");
