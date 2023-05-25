@@ -24,18 +24,21 @@ ex4) exit or ctrl-c
 ";
 const ADD: &str = "add";
 const TO: &str = "to";
-const OMITTED_TO_MESSAGE: &str =
-    "Omitted a [to] from command.\nusage : add [employee_name] to [department_name]";
-const OMITTED_NAME: &str =
-    "Omitted a [employee_name] from command.\nusage : add [employee_name] to [department_name]";
-const OMITTED_DEPARTMENT: &str =
-    "Omitted a [department_name] from command.\nusage : add [employee_name] to [department_name].";
+const OMITTED_TO_MESSAGE: &str = "
+Omitted a [to] from command.\nusage : add [employee_name] to [department_name]
+";
+const OMITTED_NAME: &str = "
+Omitted a [employee_name] from command.\nusage : add [employee_name] to [department_name]
+";
+const OMITTED_DEPARTMENT: &str = "
+Omitted a [department_name] from command.\nusage : add [employee_name] to [department_name].
+";
 const SHOW: &str = "show";
 const EXIT: &str = "exit";
 
 fn main() {
     display_command();
-    let mut department: HashMap<String, String> = HashMap::new();
+    let mut department: HashMap<String, Vec<String>> = HashMap::new();
 
     loop {
         let mut input: String = String::new();
@@ -44,17 +47,16 @@ fn main() {
             .read_line(&mut input)
             .expect(&format!("{}{}", CLEAR, MESSAGE)[..]);
 
+        let source = input.trim();
         let command = input.trim().to_lowercase();
         let split_words: Vec<&str> = command.split(" ").collect();
         let first_word: &str = split_words
             .get(0)
             .expect(&format!("{}{}", CLEAR, MESSAGE)[..]);
 
-        // println!("split_words : {:?}", split_words);
-
         match first_word {
             ADD => {
-                add_employee(split_words, &mut department);
+                add_employee(split_words, &source, &mut department);
             }
             SHOW => {}
             EXIT => {
@@ -69,7 +71,7 @@ fn display_command() {
     println!("{}{}", CLEAR, MESSAGE);
 }
 
-fn add_employee(words: Vec<&str>, map: &mut HashMap<String, String>) {
+fn add_employee(words: Vec<&str>, source: &str, map: &mut HashMap<String, Vec<String>>) {
     if !words.contains(&TO) {
         display_command();
         println!("{}", OMITTED_TO_MESSAGE);
@@ -95,6 +97,7 @@ fn add_employee(words: Vec<&str>, map: &mut HashMap<String, String>) {
     let department_name_slice = &words[to_index + 1..];
     let mut name = String::new();
     let mut department_name = String::new();
+    let source_slice: Vec<&str> = source.split(" ").collect();
 
     for (i, n) in name_slice.iter().enumerate() {
         if i > 0 {
@@ -112,12 +115,17 @@ fn add_employee(words: Vec<&str>, map: &mut HashMap<String, String>) {
         department_name.push_str(n);
     }
 
-    map.entry(department_name).or_insert(name);
+    if let Some(v) = map.get_mut(&department_name) {
+        v.push(name);
+        v.sort();
+    } else {
+        map.insert(department_name, vec![name]);
+    }
 
     show_department_list(&map);
 }
 
-fn show_department_list(map: &HashMap<String, String>) {
+fn show_department_list(map: &HashMap<String, Vec<String>>) {
     if map.is_empty() {
         display_command();
         println!("No registered departments.");
@@ -125,7 +133,13 @@ fn show_department_list(map: &HashMap<String, String>) {
         return;
     }
 
-    let sorted: Vec<_> = map.iter().collect();
+    for (key, value) in map.iter() {
+        println!("--------------------------------------------------------");
+        println!("Department [{:?}]", key);
+        println!("--------------------------------------------------------");
 
-    println!("{:?}", sorted);
+        for n in value {
+            println!("{:?}", n);
+        }
+    }
 }
