@@ -12,7 +12,7 @@
 //! * quit
 
 use std::collections::HashMap;
-use std::io;
+use std::{format, io};
 
 const CLEAR: &str = "\x1B[2J\x1B[1;1H";
 const MESSAGE: &str = "
@@ -33,8 +33,11 @@ Omitted a [employee_name] from command.\nusage : add [employee_name] to [departm
 const OMITTED_DEPARTMENT: &str = "
 Omitted a [department_name] from command.\nusage : add [employee_name] to [department_name].
 ";
+const DENIED_USE_KEYWORD: &str = "is reserved keyword.";
+const NOT_EXIST_DEPARTMENT: &str = "does not exist.";
 const SHOW: &str = "show";
 const EXIT: &str = "exit";
+const ALL: &str = "all";
 
 fn main() {
     display_command();
@@ -58,7 +61,9 @@ fn main() {
             ADD => {
                 add_employee(split_words, &source, &mut department);
             }
-            SHOW => {}
+            SHOW => {
+                show_list(&split_words[1..], &department);
+            }
             EXIT => {
                 break;
             }
@@ -93,36 +98,69 @@ fn add_employee(words: Vec<&str>, source: &str, map: &mut HashMap<String, Vec<St
         println!("{}", OMITTED_NAME);
     }
 
-    let name_slice = &words[1..to_index];
-    let department_name_slice = &words[to_index + 1..];
-    let mut name = String::new();
-    let mut department_name = String::new();
+    let name_slice: &[&str] = &words[1..to_index];
+    let department_name_slice: &[&str] = &words[to_index + 1..];
+    let mut name: String = String::new();
+    let mut department_name: String = String::new();
     let source_slice: Vec<&str> = source.split(" ").collect();
+    let name_source_slice: &[&str] = &source_slice[1..to_index];
+    let department_name_source_slice: &[&str] = &source_slice[to_index + 1..];
 
-    for (i, n) in name_slice.iter().enumerate() {
+    for (i, _) in name_slice.iter().enumerate() {
         if i > 0 {
             name.push_str(" ");
         }
 
-        name.push_str(n);
+        name.push_str(name_source_slice[i]);
     }
 
-    for (i, n) in department_name_slice.iter().enumerate() {
+    for (i, _) in department_name_slice.iter().enumerate() {
         if i > 0 {
             department_name.push_str(" ");
         }
 
-        department_name.push_str(n);
+        department_name.push_str(department_name_source_slice[i]);
     }
 
-    if let Some(v) = map.get_mut(&department_name) {
-        v.push(name);
-        v.sort();
+    // all은 부서명으로 사용할 수 없음
+    if department_name.to_lowercase() == ALL {
+        display_command();
+        println!("[{}] {}", department_name, DENIED_USE_KEYWORD);
+
+        return;
+    }
+
+    let exist_keys: Vec<&String> = map
+        .keys()
+        .filter(|k| k.to_lowercase() == department_name.to_lowercase())
+        .collect();
+
+    if exist_keys.len() > 0 {
+        map.get_mut(&exist_keys[0].to_string()).unwrap().push(name);
     } else {
         map.insert(department_name, vec![name]);
     }
 
     show_department_list(&map);
+}
+
+fn show_list(target: &[&str], map: &HashMap<String, Vec<String>>) {
+    if format!("{:?}", target).to_lowercase() == ALL {
+        println!("show all");
+    }
+    // if target.to_lowercase() == ALL {
+    //     println!("전체 출력");
+    // } else {
+    //     let exist_keys: Vec<_> = map
+    //         .keys()
+    //         .filter(|k| k.to_lowercase() == target.to_lowercase())
+    //         .collect();
+
+    //     if exist_keys.len() == 0 {
+    //         display_command();
+    //         println!("[{}] {}", target, NOT_EXIST_DEPARTMENT);
+    //     }
+    // }
 }
 
 fn show_department_list(map: &HashMap<String, Vec<String>>) {
